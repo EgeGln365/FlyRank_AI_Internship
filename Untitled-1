@@ -1,0 +1,279 @@
+Bence bunu bir Data Scientist / ML Engineer gibi yapmalısın. Amaç sadece veriyi görmek değil, "Bu veriden model çıkar mı?" sorusuna cevap vermek.
+
+1. Veriyi yükle ve genel resmi gör (5 dk)
+
+İlk olarak:
+
+df.shape
+df.head()
+df.sample(5)
+
+Bakman gerekenler:
+
+Kaç satır var?
+Kaç sütun var?
+Bir satır neyi temsil ediyor?
+İlk bakışta hangi feature'lar var?
+2. Veri tiplerini incele (5 dk)
+df.info()
+
+Not al:
+
+Sayısal sütunlar
+Kategorik sütunlar
+Tarih benzeri sütunlar
+Missing değerler
+3. Kolonları anlamlandır (10 dk)
+df.columns.tolist()
+
+Sonra kolonları kendin grupla.
+
+Örneğin:
+
+Kimlik
+
+content_id
+client_id
+
+Search Metrics
+
+impressions_90d
+clicks_90d
+ctr
+avg_position
+
+Content
+
+word_count
+content_age_days
+days_since_last_update
+
+Trend
+
+trend_direction
+trend_pct
+
+Bunu yapmak ileride feature engineering'i çok kolaylaştırır.
+
+4. Veri sözlüğünü oku (10 dk)
+
+Burada artık data-dictionary.md aç.
+
+Her sütun için öğren:
+
+neyi ölçüyor
+birimi ne
+nasıl hesaplanıyor
+
+Bu adımı atlama.
+
+5. Sayısal sütunları incele (15 dk)
+df.describe().T
+
+Her sütun için kendine sor:
+
+minimum?
+maksimum?
+ortalama?
+medyan?
+çok uç değer var mı?
+6. Missing Value Analizi (10 dk)
+(df.isna().mean()*100).sort_values(ascending=False)
+
+Sorular:
+
+En çok eksik hangi sütunda?
+Bu normal mi?
+Silinir mi?
+Doldurulur mu?
+7. Kategorik kolonlar (15 dk)
+
+Her object sütunu için:
+
+df[col].value_counts()
+
+Bak:
+
+kaç kategori var
+dengesiz mi
+ilginç dağılımlar var mı
+8. Target'ı incele (10 dk)
+
+Lane 2 için en önemli yer.
+
+df["trend_direction"].value_counts()
+
+df["trend_direction"].value_counts(normalize=True)
+
+Sor:
+
+Down kaç?
+Up kaç?
+Dengesiz mi?
+9. Dağılımları incele (20 dk)
+
+Histogramlar çiz.
+
+Özellikle:
+
+CTR
+impressions
+search_volume
+word_count
+content_age_days
+avg_position
+
+Bak:
+
+normal mi
+sağa çarpık mı
+log dönüşümü gerekir mi
+10. Korelasyon (15 dk)
+corr = df.select_dtypes("number").corr()
+
+Bak:
+
+yüksek korelasyon var mı?
+aynı bilgiyi taşıyan feature var mı?
+11. Target ile ilişkiler (30 dk)
+
+Artık model gözüyle düşün.
+
+Örneğin:
+
+CTR düşük olanlarda decline daha mı fazla?
+
+df.groupby("trend_direction")["ctr"].mean()
+
+Word count değişiyor mu?
+
+df.groupby("trend_direction")["word_count"].mean()
+
+Position nasıl?
+
+df.groupby("trend_direction")["avg_position"].mean()
+
+İlk hipotezlerini burada oluştur.
+
+12. Leakage kontrolü (Çok önemli)
+
+Kendine sor:
+
+Bu feature geleceği mi söylüyor?
+
+Özellikle:
+
+trend_direction
+trend_pct
+
+Bunlar target oluşturduğu için feature olamaz.
+
+13. Business açısından düşün
+
+Şunu sor:
+
+Eğer SEO uzmanı olsaydım hangi sütunlara bakardım?
+
+Mesela:
+
+CTR
+Position
+Impressions
+Search Volume
+Content Age
+En sonunda kendine şu 10 soruyu cevaplayabiliyor olmalısın
+Bir satır neyi temsil ediyor?
+Target ne?
+En önemli feature'lar hangileri olabilir?
+En problemli feature hangisi?
+Missing var mı?
+Outlier var mı?
+Dengesiz sınıf var mı?
+Leakage riski var mı?
+İlk baseline kuralım ne olurdu?
+Bu problem gerçekten ML gerektiriyor mu?
+Ben olsam çalışma planını şöyle yapardım
+Sıra	Süre	Amaç
+1	5 dk	Shape + Head
+2	5 dk	Info
+3	10 dk	Kolonları gruplandır
+4	10 dk	Data Dictionary oku
+5	15 dk	Describe
+6	10 dk	Missing Values
+7	15 dk	Kategorik Analiz
+8	10 dk	Target Analizi
+9	20 dk	Histogramlar
+10	15 dk	Korelasyon
+11	30 dk	Target–Feature ilişkileri
+12	10 dk	Leakage kontrolü
+13	15 dk	İlk ML hipotezlerini yaz
+
+Bu sıralama seni sadece Week 2 için değil, Week 3 ve model geliştirme aşaması için de hazırlayacak. Ayrıca analiz sırasında dikkatini çeken her şeyi küçük notlar halinde yazmanı öneririm; bu notlar daha sonra rapor ve notebook açıklamalarını hazırlarken çok işine yarayacaktır.
+
+
+
+feature e.
+ctr*impression*click
+
+sessions*users
+
+İD--
+content_id
+client_id
+
+CTR--
+search_volume
+competition
+competition_level
+cpc
+
+İçerik Özellikleri--
+content_type
+word_count
+char_count
+content_age_days
+days_since_last_update
+
+word_count_tier
+char_count_tier
+age_tier
+age_tier_order
+freshness_tier
+
+
+AI--
+provider_used
+model_used
+ai_traffic_pct
+ai_sessions_90d
+
+GSC--
+impressions_90d
+clicks_90d
+
+impressions_last_30d
+clicks_last_30d
+
+impressions_prev_30d
+clicks_prev_30d
+
+ctr
+avg_position
+
+days_with_impressions
+
+impression_tier
+position_tier
+
+
+TREND--
+impressions_last_30d
+clicks_last_30d
+sessions_last_30d
+
+impressions_prev_30d
+clicks_prev_30d
+sessions_prev_30d
+
+trend_pct
+trend_direction
