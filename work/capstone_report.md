@@ -1,15 +1,15 @@
-# Capstone Report — Refresh / Content Opportunity Scoring
+# Refresh / Content Opportunity Scoring — Capstone Research Paper
 
 - **Author:** Ege Gülünay
 - **Lane:** Refresh / Content Opportunity Scoring
-- **Repo:** FlyRank_AI_Internship
+- **Repo:** [FlyRank_AI_Internship](https://github.com/EgeGln365/FlyRank_AI_Internship)
 - **Date:** September 2026
 
-## 0. Abstract
+## Abstract
 
 This project investigates how historical search-performance signals can be used to identify and rank content pages that are visible in search results but may be under-capturing clicks. The analysis uses the FlyRank ML Internship warehouse, with historical performance through March 31, 2026 used for decision-time features and April 2026 used for retrospective outcome evaluation. A transparent rule-based baseline was compared with Logistic Regression using five client-grouped validation folds and ranking metrics focused on the top of the review queue. In this evaluation, the rule-based baseline achieved mean Precision@20 of 81.0% and Precision@50 of 81.2%, compared with 49.0% and 51.6% for Logistic Regression. The resulting action playbook is intended to help SEO and content teams prioritize high-visibility, low-CTR pages for human review rather than automatically changing content.
 
-## 1. Problem framing
+## 1. Introduction / Problem Statement
 
 SEO and content teams may manage large numbers of pages while having limited time available for manual review. The practical decision supported by this project is therefore:
 
@@ -23,7 +23,7 @@ The cost of a wrong recommendation is primarily wasted review effort or an unnec
 
 Data-driven ranking is useful because manually reviewing every page is impractical. The objective is not to automate editorial decisions, but to use historical performance data to focus limited human-review capacity on larger observed opportunities first.
 
-## 2. Data safety
+## 2. Data
 
 The project uses the FlyRank ML Internship warehouse. The primary analytical source is `fact_content_daily_performance`.
 
@@ -45,7 +45,9 @@ The fixed `fact_content_query_90d` table is also excluded from March model featu
 
 No client names, domains, URLs, private search queries, credentials, or other client-identifying information are included in the public analysis or report.
 
-## 3. Baseline
+## 3. Methodology
+
+### Baseline
 
 A transparent rule-based baseline was developed before the machine-learning model.
 
@@ -74,7 +76,7 @@ Using the same five client-grouped validation folds as the Logistic Regression m
 
 The baseline therefore provided a strong reference point for the modeling stage.
 
-## 4. Model / analysis
+### Model / Analysis
 
 The machine-learning approach uses Logistic Regression to estimate an opportunity score for each eligible page.
 
@@ -102,7 +104,7 @@ This definition produced **12,273 positive opportunities among 95,633 eligible p
 
 Logistic Regression was selected as a simple and interpretable modeling approach rather than introducing unnecessary model complexity before establishing whether learned patterns improve on the transparent baseline.
 
-## 5. Evaluation
+## 4. Results
 
 Evaluation uses five-fold `StratifiedGroupKFold` cross-validation with `client_hash_id` as the grouping variable.
 
@@ -119,13 +121,15 @@ Both approaches were evaluated on the same client-grouped folds:
 | Rule-based baseline | 81.0% | 81.2% |
 | Logistic Regression | 49.0% | 51.6% |
 
+![Rule-Based Baseline vs Logistic Regression](capstone_baseline_vs_logreg.png)
+
+*Figure 1. Mean Precision@20 and Precision@50 for the rule-based baseline and Logistic Regression across the five client-grouped validation folds.*
+
 The rule-based baseline therefore achieved higher top-of-queue precision in this evaluation.
 
 The result should not be interpreted as evidence that rule-based methods are generally superior to machine-learning models. It is specific to this dataset, target definition, feature set, and validation design.
 
-Error analysis also showed that the methods were not identical. Logistic Regression ranked some true opportunities in its top 50 that the explicit baseline rule did not select, while the baseline successfully prioritized other true opportunities that Logistic Regression ranked substantially lower. This suggests that the model may capture patterns beyond the explicit baseline rule, but those additional patterns did not produce stronger overall top-of-queue precision in the evaluation performed here.
-
-## 6. Interpretation
+### Interpretation
 
 The main result of the project is a negative modeling result with practical value: additional model complexity did not improve the primary ranking metrics over the transparent baseline.
 
@@ -137,7 +141,19 @@ This is useful because the simpler method is easier to explain to an editor. A r
 
 The result does not establish that trend information has no value. Logistic Regression identified some true opportunities that the baseline missed, indicating that the methods can capture partially different patterns. Further work could investigate whether those complementary signals improve a hybrid ranking strategy.
 
-## 7. Recommendation
+## 5. Limitations & Honest Framing
+
+This project is a retrospective decision-support analysis and does not establish causal effects. The observed relationships should be interpreted as measured associations that can help prioritize human review, not as proof that changing a title, meta description, or page content will improve search performance.
+
+The evaluation population requires at least 20 GSC-available days in both March and April. Because April availability is used to define the retrospectively evaluable population, the reported metrics describe that population rather than a fully prospective production cohort.
+
+The opportunity label is a practical proxy rather than ground truth. It is defined from April visibility, impression volume, and a low-CTR threshold, so results depend on that definition and on the available search-performance fields.
+
+Client-grouped cross-validation reduces same-client leakage between training and validation folds, but performance on future clients, later time periods, or different content mixes may differ. The analysis therefore does not claim universal generalization, a sealed or blind holdout result, knowledge of Google's ranking algorithm, or guaranteed impact from any recommended editorial action.
+
+The available features do not capture every factor that may explain CTR or search performance, including intent, SERP composition, seasonality, brand effects, and editorial context. All ranked recommendations therefore remain human-review prompts rather than automatic content actions.
+
+## 6. Ranked Recommendations
 
 The validated rule-based approach is used as the primary foundation for the action playbook.
 
@@ -161,11 +177,17 @@ The system should therefore remain a decision-support tool. It should not automa
 
 A FlyRank editor could use the ranked queue as a daily or weekly review list, inspect the surrounding business and search context, and then decide whether any editorial action is justified.
 
-## 8. Reproducibility
+## 7. Reproducibility
 
 The project is designed to be reproduced using the committed GitHub repository, Google Colab, and the FlyRank internship warehouse hosted on Hugging Face.
 
-### Repository and environment
+### Project Links
+
+- **Deployed paper:** [Capstone Research Paper](https://egegln365.github.io/FlyRank_AI_Internship/capstone/)
+- **Repository:** [FlyRank_AI_Internship](https://github.com/EgeGln365/FlyRank_AI_Internship)
+- **Capstone notebook:** [work/notebooks/capstone.ipynb](https://github.com/EgeGln365/FlyRank_AI_Internship/blob/main/work/notebooks/capstone.ipynb)
+
+### Repository and Environment
 
 The complete analysis is stored in the project repository. The main Python dependencies are documented in `requirements.txt`:
 
@@ -179,7 +201,7 @@ The complete analysis is stored in the project repository. The main Python depen
 
 The repository's official setup workflow uses Google Colab, so a local Python or Jupyter installation is not required to reproduce the notebooks.
 
-### Data access
+### Data Access
 
 The analysis uses the gated `FlyRank/internship-warehouse` dataset hosted on Hugging Face.
 
@@ -192,23 +214,19 @@ Before running the warehouse-dependent notebooks:
 
 The token must never be hardcoded into notebook cells or committed to the public repository.
 
-### Re-running the analysis
+### Re-running the Analysis
 
 From a fresh copy of the repository:
 
 1. Open the repository on GitHub.
-2. Open the required notebooks through their Colab links or through **File → Open notebook → GitHub** in Google Colab.
+2. Open the required assignment notebooks through their Colab links or through **File → Open notebook → GitHub** in Google Colab.
 3. Provide `HF_TOKEN` when warehouse access is required.
-4. Run the assignment notebooks in order.
-5. Finish with:
+4. Run the assignment notebooks in order so that the feature construction, baseline, model validation, and action-playbook stages are reproduced.
+5. Finish with `work/notebooks/capstone.ipynb` to reproduce the capstone-level data checks, analysis summary, and paper artifacts.
 
-`work/notebooks/capstone.ipynb`
+For each notebook, use **Runtime → Run all**.
 
-For each notebook, use:
-
-**Runtime → Run all**
-
-The capstone notebook should execute from top to bottom without errors and reproduce the reported analysis outputs.
+The reported model-versus-baseline metrics are the validated results from the client-grouped evaluation developed in the modeling and validation stages of the project. The capstone notebook summarizes and carries these validated project results into the final paper; it should not be interpreted as an independent sealed-holdout evaluation.
 
 For users who prefer a local Python environment, the committed dependencies can also be installed with:
 
@@ -220,7 +238,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Reproducibility settings
+### Reproducibility Settings
 
 The main modeling configuration uses:
 
@@ -233,9 +251,9 @@ The main modeling configuration uses:
 
 Client and content identifiers are used only for grouping, joining, and traceability. They are not used as predictive model features.
 
-### Expected validation checks
+### Validated Project Results
 
-A successful reproduction should recover the main validated project results:
+The client-grouped validation stage produced the following project results:
 
 - Eligible retrospective evaluation population: **95,633 pages**
 - Positive opportunities: **12,273**
@@ -253,6 +271,7 @@ The primary model-versus-baseline figure is stored at:
 The public repository must not contain credentials, Hugging Face tokens, client names, domains, URLs, private search queries, or private raw exports.
 
 This project uses client-grouped cross-validation and does not claim a sealed or blind holdout evaluation.
-## 9. Acknowledgments & data credit
+
+## 8. Acknowledgments & Data Credit
 
 Built on the [FlyRank ML Internship dataset](https://flyrank.ai).
